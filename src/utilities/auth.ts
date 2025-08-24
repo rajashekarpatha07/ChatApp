@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs';
-import { promises } from 'dns';
 import jwt from 'jsonwebtoken';
 
 
