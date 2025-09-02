@@ -1,8 +1,14 @@
 import { Router } from "express";
-import { registeruser } from "../controllers/user.controller";
+import { registeruser, loginuser, logoutUser} from "../controllers/user.controller";
+import { UserVerify } from "../middlewares/auth.middleware";
+import { userInfo } from "os";
 
 const router = Router()
 
 router.route("/register").post(registeruser)
+router.route("/login").post(loginuser)
+
+//secure routes
+router.route("/logout").post(UserVerify, logoutUser)
 
 export default router

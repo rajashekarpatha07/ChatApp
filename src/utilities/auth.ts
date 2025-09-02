@@ -10,13 +10,13 @@ const ispasswordmatch = async(hashedpassword:string, plainpassword:string ):Prom
     return await bcrypt.compare(plainpassword, hashedpassword)
 }
 
-const GenerateAccessToken = (userId: string): string => {
+const GenerateAccessToken = (userId: number): string => {
   const secret = process.env.ACCESS_TOKEN_SECRET;
   if (!secret) throw new Error("ACCESS_TOKEN_SECRET is not set");
   return jwt.sign({ id: userId }, secret, { expiresIn: "15m" });
 };
 
-const GenerateRefreshToken = (userId: string): string => {
+const GenerateRefreshToken = (userId: number): string => {
   const secret = process.env.REFRESH_TOKEN_SECRET;
   if (!secret) throw new Error("REFRESH_TOKEN_SECRET is not set");
   return jwt.sign({ id: userId }, secret, { expiresIn: "100d" });
