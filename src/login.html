@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Chat App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-900 text-white flex items-center justify-center h-screen"
+  >
+    <div
+      class="w-full max-w-sm p-8 space-y-8 bg-gray-800 shadow-2xl rounded-lg"
+    >
+      <div>
+        <h2 class="text-3xl font-bold text-center text-white">
+          Sign in to your account
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-400">
+          Or
+          <a href="#" class="font-medium text-blue-500 hover:text-blue-400"
+            >start your 14-day free trial</a
+          >
+        </p>
+      </div>
+      <form id="login-form" class="space-y-6">
+        <div
+          id="error-message"
+          class="hidden px-4 py-3 rounded-md bg-red-900 border border-red-700 text-red-200 text-sm"
+        >
+          <!-- Error messages will be displayed here -->
+        </div>
+        <div class="rounded-md shadow-sm -space-y-px">
+          <div>
+            <label for="email" class="sr-only">Email address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              class="appearance-none rounded-t-md relative block w-full px-3 py-3 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+              placeholder="Email address"
+            />
+          </div>
+          <div>
+            <label for="password" class="sr-only">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              class="appearance-none rounded-b-md relative block w-full px-3 py-3 border border-gray-700 bg-gray-700 placeholder-gray-400 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+              placeholder="Password"
+            />
+          </div>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 transition-colors"
+          >
+            Sign in
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const loginForm = document.getElementById("login-form");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const errorMessageDiv = document.getElementById("error-message");
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorMessageDiv.classList.add("hidden"); // Hide previous errors
+
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        try {
+          const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            // Use the message from your ApiResponse
+            throw new Error(data.message || "An unknown error occurred.");
+          }
+
+          // On successful login, the server sets httpOnly cookies.
+          // We can now redirect to the chat page.
+          window.location.href = "/chat";
+        } catch (error) {
+          errorMessageDiv.textContent = error.message;
+          errorMessageDiv.classList.remove("hidden");
+        }
+      });
+    </script>
+  </body>
+</html>

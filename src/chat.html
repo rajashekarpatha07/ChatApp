@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+
+    <div class="w-full max-w-md h-full md:h-auto md:max-h-[90vh] flex flex-col bg-gray-800 shadow-2xl rounded-lg overflow-hidden">
+        <header class="bg-gray-700 p-4 shadow-md">
+            <h1 class="text-xl font-bold text-center">General Chat</h1>
+        </header>
+
+        <ul id="messages" class="flex-1 p-4 space-y-4 overflow-y-auto">
+            <!-- Messages will appear here -->
+             <li class="text-center text-gray-400 text-sm">Welcome to the chat!</li>
+        </ul>
+
+        <form id="form" class="flex p-4 bg-gray-700 border-t border-gray-600">
+            <input id="input" autocomplete="off" class="flex-1 bg-gray-600 border border-gray-500 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400" placeholder="Type a message..." />
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-md transition-colors">Send</button>
+        </form>
+    </div>
+
+    <!-- Make sure to change the URL to your server's URL -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <script>
+        // --- Client-side Socket.io Logic ---
+        const socket = io("http://localhost:3000", {
+             // This sends the cookies along with the connection request
+            withCredentials: true
+        });
+
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+
+        // --- Event Emitter for sending messages ---
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('message:send', input.value);
+                input.value = '';
+            }
+        });
+
+        // --- Event Listener for receiving messages ---
+        socket.on('message:receive', (data) => {
+            const item = document.createElement('li');
+            item.innerHTML = `<span class="font-bold text-blue-400">${data.user.username}:</span> ${data.message}`;
+            item.classList.add('px-4', 'py-2', 'bg-gray-700', 'rounded-lg', 'max-w-xs');
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        });
+        
+        // --- Listen for system messages ---
+        const addSystemMessage = (msg) => {
+             const item = document.createElement('li');
+             item.textContent = msg;
+             item.classList.add('text-center', 'text-gray-400', 'text-sm', 'italic');
+             messages.appendChild(item);
+             messages.scrollTop = messages.scrollHeight;
+        }
+
+        socket.on('user:joined', (msg) => addSystemMessage(msg));
+        socket.on('user:left', (msg) => addSystemMessage(msg));
+
+        // --- Connection error handling ---
+        socket.on('connect_error', (err) => {
+            addSystemMessage(`Connection failed: ${err.message}. Please log in and refresh.`);
+        });
+
+    </script>
+</body>
+</html>

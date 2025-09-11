@@ -22,7 +22,4 @@ const UserVerify = asyncHandler(
     }
   }
 );
-
-export {
-    UserVerify
-}
+export { UserVerify };
